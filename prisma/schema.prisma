@@ -1,0 +1,57 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  name      String?
+  image     String?
+  months    Month[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Month {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  year      Int
+  month     Int
+  name      String
+  config    Json
+  days      Day[]
+  createdAt DateTime @default(now())
+
+  @@unique([userId, year, month])
+}
+
+model Day {
+  id        String   @id @default(cuid())
+  monthId   String
+  month     Month    @relation(fields: [monthId], references: [id])
+  date      DateTime
+  checks    Json
+  values    Json
+  alignment Int
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([monthId, date])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  userId    String?
+  habits    Json
+  metrics   Json
+  createdAt DateTime @default(now())
+}
+
+
